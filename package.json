@@ -11,6 +11,8 @@
   "license": "ISC",
   "description": "An exercise which attempts to solve a problem involving ads and discount structures",
   "devDependencies": {
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-typescript": "^7.27.0",
     "@eslint/js": "^9.24.0",
     "@types/jest": "^29.5.14",
     "eslint": "^9.24.0",
