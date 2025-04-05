@@ -1,0 +1,7 @@
+# exclude node/typescript dirs
+dist
+lib
+node_modules
+
+# exclude jest coverage
+coverage
