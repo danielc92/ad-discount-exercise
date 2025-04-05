@@ -1,0 +1,7 @@
+const Ads = {
+
+}
+
+export {
+    Ads
+}

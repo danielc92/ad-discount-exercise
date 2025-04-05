@@ -1,0 +1,1 @@
+describe("PricingStrategy test suite", () => {})
