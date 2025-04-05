@@ -16,11 +16,8 @@ import { FixedDiscountPricingStrategy, GroupBuyPricingStrategy } from "../../Pri
 
 describe("Checkout test suite", () => {
     it("SecondBite: Checkout with 3 for 2 deal on classic ads", () => {
-        const checkout = new Checkout({
-            CLASSIC: new GroupBuyPricingStrategy(AdNameEnum.CLASSIC, {groupBuyUpperLimit: 3, groupBuyLowerLimit: 2}),
-            PREMIUM: null,
-            STAND_OUT: null
-        })
+        const pricingStragies = [new GroupBuyPricingStrategy(AdNameEnum.CLASSIC, {groupBuyUpperLimit: 3, groupBuyLowerLimit: 2})]
+        const checkout = new Checkout(pricingStragies)
 
         checkout.addItem(AdNameEnum.CLASSIC)
         checkout.addItem(AdNameEnum.CLASSIC)
@@ -32,11 +29,9 @@ describe("Checkout test suite", () => {
     })
 
     it("Axil Coffee Roasters: they get 23$ (2300 cents) off all standout ads ", () => {
-        const checkout = new Checkout({
-            CLASSIC: null,
-            PREMIUM: null,
-            STAND_OUT: new FixedDiscountPricingStrategy(AdNameEnum.STAND_OUT, {fixedDiscountAmount: 2300})
-        })
+
+        const pricingStragies = [new FixedDiscountPricingStrategy(AdNameEnum.STAND_OUT, {fixedDiscountAmount: 2300})]
+        const checkout = new Checkout(pricingStragies)
 
         // we will buy two to keep things simple
         checkout.addItem(AdNameEnum.STAND_OUT)
@@ -48,11 +43,13 @@ describe("Checkout test suite", () => {
     })
 
     it("MYER: 5 for 4 on stand out ads + 5$ discount on all premium ads", () => {
-        const checkout = new Checkout({
-            CLASSIC: null,
-            PREMIUM: new FixedDiscountPricingStrategy(AdNameEnum.PREMIUM, {fixedDiscountAmount: 500}),
-            STAND_OUT: new GroupBuyPricingStrategy(AdNameEnum.STAND_OUT, {groupBuyUpperLimit: 5, groupBuyLowerLimit: 4})
-        })
+
+        const pricingStragies = [
+            new FixedDiscountPricingStrategy(AdNameEnum.PREMIUM, {fixedDiscountAmount: 500}),
+            new GroupBuyPricingStrategy(AdNameEnum.STAND_OUT, {groupBuyUpperLimit: 5, groupBuyLowerLimit: 4})
+        ]
+
+        const checkout = new Checkout(pricingStragies)
 
         checkout.addItem(AdNameEnum.PREMIUM)
         checkout.addItem(AdNameEnum.STAND_OUT)

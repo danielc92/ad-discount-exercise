@@ -17,6 +17,24 @@ import { AdNameEnum, AllAds } from "../../Ads"
 describe("PricingStrategy test suite", () => {
     describe("FixedDiscountPricingStrategy", () =>{
 
+        it("should throw error when there number of ads is negative", () =>{
+            const strategy = new FixedDiscountPricingStrategy(AdNameEnum.PREMIUM, {
+                fixedDiscountAmount: 10,
+            })
+            expect(
+             () => strategy.calculatePrice(-1)
+            ).toThrow("totalNumberOfAds must be greater or equal to 0")
+        })
+
+        it("should return 0 when there are 0 items passed to calculatePrice()", () =>{
+            const strategy = new FixedDiscountPricingStrategy(AdNameEnum.PREMIUM, {
+                fixedDiscountAmount: 10,
+            })
+            expect(
+            strategy.calculatePrice(0)
+            ).toEqual(0)
+        })
+
         it("should throw error fixedDiscountAmount is greater than the value of the ad", () =>{
             const strategy = new FixedDiscountPricingStrategy(AdNameEnum.PREMIUM, {
                 fixedDiscountAmount: 999_999_999,
@@ -73,6 +91,28 @@ describe("PricingStrategy test suite", () => {
     })
 
     describe("GroupBuyPricingStrategy", () => {
+
+        it("should return price of 0 when calculatePrice() receives 0 items", () =>{
+            const strategy = new GroupBuyPricingStrategy(AdNameEnum.PREMIUM, {
+                groupBuyLowerLimit: 1,
+                groupBuyUpperLimit: 2,
+            })
+            expect(
+              strategy.calculatePrice(0)
+            ).toEqual(0)
+        })
+
+
+        it("should throw error when there number of ads is negative", () =>{
+            const strategy = new GroupBuyPricingStrategy(AdNameEnum.PREMIUM, {
+                groupBuyLowerLimit: 1,
+                groupBuyUpperLimit: 2,
+            })
+            expect(
+             () => strategy.calculatePrice(-1)
+            ).toThrow("totalNumberOfAds must be greater or equal to 0")
+        })
+
         it("should throw error when lower or upper limits are undefined", () => {
             const strategy = new GroupBuyPricingStrategy(AdNameEnum.CLASSIC, {
                 groupBuyLowerLimit: undefined,
@@ -163,7 +203,7 @@ describe("PricingStrategy test suite", () => {
             expect(
                 strategy.calculatePrice(7)
             ).toEqual(
-                // should be 4 times the price (for the group by) + 2 times for the remainder
+                // should be 4 times the price (for the group buy) + 2 times for the remainder
                 currentAdPrice * 4 +  currentAdPrice * 2
             )
         })

@@ -26,11 +26,17 @@ abstract class PricingStrategyBase {
         this.calculatePriceInput = calculatePriceInput
     }
 
+    getAdName = () => this.currentAd
+
+    
+
 }
 
 // if a user purchases x amount they get a discount, assuming that these discounts can stack up
 // for example if the strategy is buy 3 for 2, if they buy 6, they will get 4
 class GroupBuyPricingStrategy extends PricingStrategyBase {
+
+  
 
     validateInputs(totalNumberOfAds: number): void {
         const { groupBuyLowerLimit, groupBuyUpperLimit} = this.calculatePriceInput;
@@ -39,7 +45,7 @@ class GroupBuyPricingStrategy extends PricingStrategyBase {
             typeof groupBuyLowerLimit !== "number" || 
             typeof groupBuyUpperLimit !== "number") throw new Error("groupBuyLowerLimit, groupBuyUpperLimit and totalNumberOfAds must be of type number")
 
-        if (totalNumberOfAds <1) throw new Error("totalNumberOfAds must be greater than 0")
+        if (totalNumberOfAds < 0) throw new Error("totalNumberOfAds must be greater or equal to 0")
         // '2 for 1' is the minimmum allowed input for this strategy, for the sake of this exercise there is no upper limit and it is flexible
         if (groupBuyUpperLimit < 2) throw new Error("the groupBuyUpperLimit must be at least 2")
         if (groupBuyLowerLimit < 1) throw new Error("the lower limit must be at least 1")
@@ -48,6 +54,9 @@ class GroupBuyPricingStrategy extends PricingStrategyBase {
     }
 
     calculatePrice(totalNumberOfAds: number): number {
+
+        if (totalNumberOfAds === 0) return 0
+
         const { groupBuyLowerLimit = 0, groupBuyUpperLimit = 0} = this.calculatePriceInput;
         
         this.validateInputs(totalNumberOfAds)
@@ -65,6 +74,7 @@ class GroupBuyPricingStrategy extends PricingStrategyBase {
 // if a user buys any amount of a particular ad, they will get a fixed dollar amount discount
 class FixedDiscountPricingStrategy extends PricingStrategyBase {
 
+
     validateInputs(totalNumberOfAds: number) {
         const {fixedDiscountAmount} = this.calculatePriceInput;
         const currentAdPrice = this.ads[this.currentAd].retailPriceCentsAUD
@@ -72,6 +82,8 @@ class FixedDiscountPricingStrategy extends PricingStrategyBase {
         if (typeof fixedDiscountAmount !== "number" || typeof totalNumberOfAds !== "number") {
             throw new  Error("fixedDiscountAmount and totalNumberOfAds must be of type number")
         } 
+
+        if (totalNumberOfAds < 0) throw new Error("totalNumberOfAds must be greater or equal to 0")
 
         if (fixedDiscountAmount <=0) {
             throw new Error("fixedDiscountAmount must be a positive number")
@@ -83,6 +95,9 @@ class FixedDiscountPricingStrategy extends PricingStrategyBase {
     }
 
     calculatePrice(totalNumberOfAds: number): number {
+
+        if (totalNumberOfAds === 0) return 0
+
         this.validateInputs(totalNumberOfAds)
 
         const {fixedDiscountAmount} = this.calculatePriceInput;

@@ -4,18 +4,36 @@ import { FixedDiscountPricingStrategy, GroupBuyPricingStrategy, PricingStrategyB
 
 type PricingStrategyOrNull = GroupBuyPricingStrategy | FixedDiscountPricingStrategy | null
 
-// when you construct a Checkout instance you can specify a pricing strategy for each ad type
-// if there is no strategy you wish to use, then you may leave as null
-type CheckoutConstructorOptions = {
+// Checkout constructor takes in a list of Pricing Strategies
+type CheckoutConstructorOptions =  Array<GroupBuyPricingStrategy | FixedDiscountPricingStrategy>
+
+
+type PricingStrategyMap = {
     [key in AdNameEnum]: PricingStrategyOrNull
 }
 
 // the default if not supplied will be no stragey for each ad type
-const DEFAULT_PRICING_STRATEGY = {
+const DEFAULT_PRICING_STRATEGY: PricingStrategyMap = {
     CLASSIC: null,
     PREMIUM: null,
-    STAND_OUT:null
+    STAND_OUT: null
 }
+
+const getPricingStrategyMapFromList = (pricingList: CheckoutConstructorOptions ) : PricingStrategyMap=> {
+
+    const pricingMap = pricingList.reduce(
+        (map, pricingStrategy) => {
+            const adName = pricingStrategy.getAdName()
+            map[adName] = pricingStrategy
+            return map
+        }, 
+        {...DEFAULT_PRICING_STRATEGY}
+    )
+
+    return pricingMap
+}
+
+
 
 class Checkout {
 
@@ -25,7 +43,7 @@ class Checkout {
     }
 
     pricingStrategies: {
-        [key in AdNameEnum]: GroupBuyPricingStrategy | FixedDiscountPricingStrategy | null
+        [key in AdNameEnum]: PricingStrategyOrNull
     }
 
     totalPriceInCents: number
@@ -37,7 +55,7 @@ class Checkout {
             PREMIUM: 0,
             STAND_OUT: 0
         }
-        this.pricingStrategies = pricingStrategies ?? DEFAULT_PRICING_STRATEGY
+        this.pricingStrategies = getPricingStrategyMapFromList(pricingStrategies ?? [])
         this.totalPriceInCents = 0
     }
 
@@ -52,10 +70,8 @@ class Checkout {
     // the calculation pathway is simplified here as you either have a pricing strategy 
     // (something that extends the PricingStrategyBase abstract class) or you use the default one
     calculatePriceInCents = () => {
-
-        let total = 0
-
-        for (const adName of Object.values(AdNameEnum)) {
+        
+        this.totalPriceInCents = Object.values(AdNameEnum).reduce((total, adName) => {
             if (this.pricingStrategies[adName] instanceof PricingStrategyBase) {
                 const subtotal = this.pricingStrategies[adName].calculatePrice(this.adCounts[adName])
                 total += subtotal
@@ -64,9 +80,8 @@ class Checkout {
                 // default pricing strategy is to use the original prices multiplied by the count of ads
                 total += (AllAds[adName].retailPriceCentsAUD * this.adCounts[adName])
             }
-        }
-
-        this.totalPriceInCents = total
+            return total
+        }, 0)
 
     }
 
