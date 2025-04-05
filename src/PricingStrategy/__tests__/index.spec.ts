@@ -178,6 +178,19 @@ describe("PricingStrategy test suite", () => {
             )
         })
 
+        it("should calculate price for a 5 for 4 deal on CLASSIC ads accurately when the total number of ads is less than the maximum group buy", () => {
+            const strategy = new GroupBuyPricingStrategy(AdNameEnum.CLASSIC, {
+                groupBuyLowerLimit: 4,
+                groupBuyUpperLimit: 5,
+               
+            })
+            expect(
+                strategy.calculatePrice(3)
+            ).toEqual(
+                AllAds.CLASSIC.retailPriceCentsAUD * 3
+            )
+        })
+
         it("should calculate price for a 5 for 4 deal on STAND_OUT ads accurately", () => {
             const strategy = new GroupBuyPricingStrategy(AdNameEnum.STAND_OUT, {
                 groupBuyLowerLimit: 4,
